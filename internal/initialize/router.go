@@ -1,26 +1,43 @@
 package initialize
 
 import (
-	c "go-ecommerce-backend-api/internal/controller"
-	"go-ecommerce-backend-api/internal/middlewares"
+	"go-ecommerce-backend-api/global"
+	"go-ecommerce-backend-api/internal/routers"
 
 	"github.com/gin-gonic/gin"
 )
 
 func InitRouter() *gin.Engine {
-	r := gin.Default()
-
-	r.Use(middlewares.AuthenMiddleware())
-
-	v1 := r.Group("/v1/2024")
-	{
-		v1.GET("/ping", c.NewPongController().GetPongById)
-		v1.GET("/user/1", c.NewUserController().GetUserById)
+	var r *gin.Engine
+	if global.Config.Server.Mode =="dev" {
+		gin.SetMode(gin.DebugMode)
+		gin.ForceConsoleColor()
+		r = gin.Default()
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+		r = gin.New()
 	}
 
-	v2 := r.Group("/v2/2024", c.NewUserController().GetUserById)
+	//midlewares
+
+	// r.Use() //logging
+	// r.Use() //cross
+	// r.Use() //limiter global
+	manageRouter := routers.RouterGroupApp.Manage
+	userRouter := routers.RouterGroupApp.User
+
+	MainGroup := r.Group("v1/2025")
 	{
-		v2.GET("/ping")
+		MainGroup.GET("/checkStatus") // tracking monitor
+	}
+	{
+		userRouter.InitUserRouter(MainGroup)
+		userRouter.InitProductRouter(MainGroup)
+	}
+	{
+		manageRouter.InitAdminRouter(MainGroup)
+		manageRouter.InitAdminRouter(MainGroup)
 	}
 	return r
+
 }
