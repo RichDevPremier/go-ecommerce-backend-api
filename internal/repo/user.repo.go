@@ -1,11 +1,28 @@
 package repo
 
-type UserRepo struct{}
+// type UserRepo struct{}
 
-func NewUserRepo() *UserRepo {
-	return &UserRepo{}
+// func NewUserRepo() *UserRepo {
+// 	return &UserRepo{}
+// }
+
+// func (ur *UserRepo) GetInfoUser() string {
+// 	return "Giau"
+// }
+
+//Interface version
+
+type IUserRepository interface {
+	GetUserByEmail(email string) bool
 }
 
-func (ur *UserRepo) GetInfoUser() string {
-	return "Giau"
+type userRepository struct{}
+
+// GEtUserByEmail implements IUserRepository.
+func (u *userRepository) GetUserByEmail(email string) bool {
+	panic("unimplemented")
+}
+
+func NewUserRepository() IUserRepository {
+	return &userRepository{}
 }
